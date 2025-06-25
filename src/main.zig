@@ -1,6 +1,8 @@
 const std = @import("std");
 const rl = @import("raylib");
 const stdout = @import("std").io.getStdOut().writer();
+const Vector2I = @import("vector2i.zig").Vector2I;
+const SnakeDir = @import("vector2i.zig").SnakeDir;
 
 const screen_side: comptime_int = 600;
 const grid_cell_count: comptime_int = 10;
@@ -8,30 +10,9 @@ const grid_spacing: comptime_int = 5;
 const grid_cell_side: comptime_int = @divExact(screen_side, grid_cell_count);
 const player_move_delay: comptime_float = 0.6;
 
-const Vector2I = struct {
-    x: i32,
-    y: i32,
-};
-
-const Direction = enum {
-    up,
-    left,
-    down,
-    right,
-
-    pub fn vector(self: Direction) Vector2I {
-        return switch (self) {
-            .up => .{ .x = 0, .y = -1 },
-            .left => .{ .x = -1, .y = 0 },
-            .down => .{ .x = 0, .y = 1 },
-            .right => .{ .x = 1, .y = 0 },
-        };
-    }
-};
-
 const Player = struct {
     pos: std.ArrayList(Vector2I),
-    dir: Vector2I = Direction.vector(Direction.up),
+    dir: Vector2I = SnakeDir.vector(SnakeDir.up),
     move_timer: f64,
     color: rl.Color = .red,
 };
@@ -42,16 +23,16 @@ const State = struct {
 
 fn processMovementInput(p: *Player) void {
     if (rl.isKeyPressed(.w)) {
-        p.dir = Direction.vector(Direction.up);
+        p.dir = SnakeDir.vector(SnakeDir.up);
     }
     if (rl.isKeyPressed(.a)) {
-        p.dir = Direction.vector(Direction.left);
+        p.dir = SnakeDir.vector(SnakeDir.left);
     }
     if (rl.isKeyPressed(.s)) {
-        p.dir = Direction.vector(Direction.down);
+        p.dir = SnakeDir.vector(SnakeDir.down);
     }
     if (rl.isKeyPressed(.d)) {
-        p.dir = Direction.vector(Direction.right);
+        p.dir = SnakeDir.vector(SnakeDir.right);
     }
 }
 
@@ -104,7 +85,7 @@ pub fn main() anyerror!void {
     var state = State{
         .player = Player{
             .pos = std.ArrayList(Vector2I).init(allocator),
-            .dir = Direction.vector(Direction.down),
+            .dir = SnakeDir.vector(SnakeDir.down),
             .move_timer = 0,
             .color = .green,
         },
