@@ -2,7 +2,7 @@ const std = @import("std");
 const rl = @import("raylib");
 const stdout = @import("std").io.getStdOut().writer();
 const Vector2I = @import("vector2i.zig").Vector2I;
-const SnakeDir = @import("vector2i.zig").SnakeDir;
+const SnakeDir = @import("snake.zig").SnakeDir;
 
 const screen_side: comptime_int = 600;
 const grid_cell_count: comptime_int = 10;
