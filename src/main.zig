@@ -1,9 +1,11 @@
-const std = @import("std");
 const rl = @import("raylib");
-const stdout = @import("std").io.getStdOut().writer();
-const Vector2I = @import("vector2i.zig").Vector2I;
-const SnakeDir = @import("snake.zig").SnakeDir;
 
+const SnakeDir = @import("snake.zig").SnakeDir;
+const Vector2I = @import("vector2i.zig").Vector2I;
+const Snake = @import("snake.zig").Snake;
+
+const std = @import("std");
+const stdout = @import("std").io.getStdOut().writer();
 const screen_side: comptime_int = 600;
 const grid_cell_count: comptime_int = 10;
 const grid_spacing: comptime_int = 5;
@@ -11,8 +13,7 @@ const grid_cell_side: comptime_int = @divExact(screen_side, grid_cell_count);
 const player_move_delay: comptime_float = 0.6;
 
 const Player = struct {
-    pos: std.ArrayList(Vector2I),
-    dir: Vector2I = SnakeDir.vector(SnakeDir.up),
+    snake: Snake,
     move_timer: f64,
     color: rl.Color = .red,
 };
@@ -23,16 +24,16 @@ const State = struct {
 
 fn processMovementInput(p: *Player) void {
     if (rl.isKeyPressed(.w)) {
-        p.dir = SnakeDir.vector(SnakeDir.up);
+        p.snake.change_direction(SnakeDir.up);
     }
     if (rl.isKeyPressed(.a)) {
-        p.dir = SnakeDir.vector(SnakeDir.left);
+        p.snake.change_direction(SnakeDir.left);
     }
     if (rl.isKeyPressed(.s)) {
-        p.dir = SnakeDir.vector(SnakeDir.down);
+        p.snake.change_direction(SnakeDir.down);
     }
     if (rl.isKeyPressed(.d)) {
-        p.dir = SnakeDir.vector(SnakeDir.right);
+        p.snake.change_direction(SnakeDir.right);
     }
 }
 
@@ -42,10 +43,8 @@ fn movePlayer(player: *Player) void {
         return;
     }
 
-    for (player.pos.items) |*pos| {
-        pos.x += player.dir.x;
-        pos.y += player.dir.y;
-    }
+    player.snake.update_directions();
+    player.snake.update_movement();
 
     player.move_timer = 0;
 }
@@ -63,11 +62,11 @@ fn drawGrid() void {
 }
 
 fn drawPlayer(player: *Player) void {
-    for (player.pos.items) |pos| {
+    for (player.snake.blocks.items) |block| {
         // zig fmt: off
         rl.drawRectangle(
-            pos.x * grid_cell_side + grid_spacing / 2,
-            pos.y * grid_cell_side + grid_spacing / 2, 
+            block.pos.x * grid_cell_side + grid_spacing / 2,
+            block.pos.y * grid_cell_side + grid_spacing / 2, 
             grid_cell_side - grid_spacing, 
             grid_cell_side - grid_spacing, 
             player.color
@@ -84,14 +83,11 @@ pub fn main() anyerror!void {
 
     var state = State{
         .player = Player{
-            .pos = std.ArrayList(Vector2I).init(allocator),
-            .dir = SnakeDir.vector(SnakeDir.down),
+            .snake = try Snake.init(.{ .x = 1, .y = 1 }, SnakeDir.right, allocator),
             .move_timer = 0,
             .color = .green,
         },
     };
-
-    try state.player.pos.append(.{ .x = 5, .y = 5 });
 
     rl.setTraceLogLevel(.none);
     rl.initWindow(screen_side, screen_side, "snake");
@@ -103,12 +99,16 @@ pub fn main() anyerror!void {
         processMovementInput(&state.player);
         movePlayer(&state.player);
 
+        if (rl.isKeyPressed(.g)) {
+            try state.player.snake.grow();
+        }
+
         rl.beginDrawing();
         defer rl.endDrawing();
 
         rl.clearBackground(.black);
         drawGrid();
         drawPlayer(&state.player);
-        rl.drawText(rl.textFormat("Dir x: %d, y: %d", .{ state.player.dir.x, state.player.dir.y }), 10, 10, 20, .white);
+        // rl.drawText(rl.textFormat("Dir x: %d, y: %d", .{ state.player.dir.x, state.player.dir.y }), 10, 10, 20, .white);
     }
 }
