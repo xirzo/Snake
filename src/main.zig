@@ -10,7 +10,7 @@ const screen_side: comptime_int = 600;
 const grid_cell_count: comptime_int = 10;
 const grid_spacing: comptime_int = 5;
 const grid_cell_side: comptime_int = @divExact(screen_side, grid_cell_count);
-const player_move_delay: comptime_float = 0.6;
+const player_move_delay: comptime_float = 0.2;
 
 const Player = struct {
     snake: Snake,
@@ -22,7 +22,7 @@ const State = struct {
     player: Player,
 };
 
-fn processMovementInput(p: *Player) void {
+fn process_movement_input(p: *Player) void {
     if (rl.isKeyPressed(.w)) {
         p.snake.change_direction(SnakeDir.up);
     }
@@ -37,7 +37,7 @@ fn processMovementInput(p: *Player) void {
     }
 }
 
-fn movePlayer(player: *Player) void {
+fn move_player(player: *Player) void {
     if (player.move_timer < player_move_delay) {
         player.move_timer += rl.getFrameTime();
         return;
@@ -49,7 +49,19 @@ fn movePlayer(player: *Player) void {
     player.move_timer = 0;
 }
 
-fn drawGrid() void {
+fn detec_wall_collision(player: *Player) void {
+    if (player.move_timer < player_move_delay) {
+        player.move_timer += rl.getFrameTime();
+        return;
+    }
+
+    player.snake.update_directions();
+    player.snake.update_movement();
+
+    player.move_timer = 0;
+}
+
+fn draw_grid() void {
     for (0..grid_cell_count) |i| {
         const pos_x: i32 = @as(i32, @intCast(i)) * grid_cell_side;
 
@@ -61,7 +73,7 @@ fn drawGrid() void {
     }
 }
 
-fn drawPlayer(player: *Player) void {
+fn draw_player(player: *Player) void {
     for (player.snake.blocks.items) |block| {
         // zig fmt: off
         rl.drawRectangle(
@@ -96,8 +108,8 @@ pub fn main() anyerror!void {
     rl.setTargetFPS(60);
 
     while (!rl.windowShouldClose()) {
-        processMovementInput(&state.player);
-        movePlayer(&state.player);
+        process_movement_input(&state.player);
+        move_player(&state.player);
 
         if (rl.isKeyPressed(.g)) {
             try state.player.snake.grow();
@@ -107,8 +119,7 @@ pub fn main() anyerror!void {
         defer rl.endDrawing();
 
         rl.clearBackground(.black);
-        drawGrid();
-        drawPlayer(&state.player);
-        // rl.drawText(rl.textFormat("Dir x: %d, y: %d", .{ state.player.dir.x, state.player.dir.y }), 10, 10, 20, .white);
+        draw_grid();
+        draw_player(&state.player);
     }
 }
