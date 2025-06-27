@@ -1,4 +1,5 @@
 const std = @import("std");
+const gr = @import("grid.zig");
 const Vector2I = @import("vector2i.zig").Vector2I;
 
 pub const SnakeDir = enum {
@@ -24,11 +25,15 @@ pub const SnakeBlock = struct {
 
 pub const Snake = struct {
     blocks: std.ArrayList(SnakeBlock),
+    g: *gr.Grid,
 
-    pub fn init(start_pos: Vector2I, start_dir: SnakeDir, allocator: std.mem.Allocator) !Snake {
+    pub fn init(start_pos: Vector2I, start_dir: SnakeDir, allocator: std.mem.Allocator, grid: *gr.Grid) !Snake {
         var snake = Snake{
             .blocks = std.ArrayList(SnakeBlock).init(allocator),
+            .g = grid,
         };
+
+        try snake.g.occupy_cell(gr.CellType.player, start_pos);
 
         try snake.blocks.append(.{
             .pos = start_pos,
@@ -43,6 +48,8 @@ pub const Snake = struct {
 
         const x = last_block.pos.x - SnakeDir.vector(last_block.dir).x;
         const y = last_block.pos.y - SnakeDir.vector(last_block.dir).y;
+
+        try self.g.occupy_cell(gr.CellType.player, .{ .x = x, .y = y });
 
         try self.blocks.append(.{
             .pos = .{ .x = x, .y = y },
@@ -66,14 +73,23 @@ pub const Snake = struct {
         }
     }
 
-    pub fn update_movement(self: *Snake) void {
+    // FIX: cannot grow
+    pub fn update_movement(self: *Snake) !void {
+        const prev_head_pos = self.blocks.items[0].pos;
+
         var i: usize = self.blocks.items.len - 1;
 
         while (i > 0) : (i -= 1) {
+            self.g.deoccupy_cell(self.blocks.items[i].pos);
             self.blocks.items[i].pos = self.blocks.items[i - 1].pos;
+            try self.g.occupy_cell(gr.CellType.player, self.blocks.items[i].pos);
         }
 
-        self.blocks.items[0].pos.x += SnakeDir.vector(self.blocks.items[0].dir).x;
-        self.blocks.items[0].pos.y += SnakeDir.vector(self.blocks.items[0].dir).y;
+        self.blocks.items[0].pos.x += self.blocks.items[0].dir.vector().x;
+        self.blocks.items[0].pos.y += self.blocks.items[0].dir.vector().y;
+
+        try self.g.occupy_cell(gr.CellType.player, self.blocks.items[0].pos);
+
+        self.g.deoccupy_cell(prev_head_pos);
     }
 };

@@ -33,4 +33,9 @@ pub const Grid = struct {
         self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].type = cell_type;
         self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].is_empty = false;
     }
+
+    pub fn deoccupy_cell(self: *Grid, pos: Vector2I) void {
+        self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].type = CellType.empty;
+        self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].is_empty = true;
+    }
 };

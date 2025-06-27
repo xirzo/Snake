@@ -25,12 +25,14 @@ pub fn main() anyerror!void {
             .cells = .{.{Cell{ .is_empty = true }} ** s.grid_cell_count} ** s.grid_cell_count,
         },
         .player = Player{
-            .snake = try Snake.init(.{ .x = 1, .y = 1 }, SnakeDir.right, allocator),
+            .snake = undefined,
             .move_timer = 0,
         },
         .apples = std.ArrayList(Vector2I).init(allocator),
         .is_finished = false,
     };
+
+    state.player.snake = try Snake.init(.{ .x = 1, .y = 1 }, SnakeDir.right, allocator, &state.grid);
 
     rl.setTraceLogLevel(.none);
     rl.initWindow(s.screen_side, s.screen_side, "snake");
@@ -42,7 +44,7 @@ pub fn main() anyerror!void {
         if (state.is_finished == false) {
             m.clamp_player_movement(&state, &state.player);
             m.process_movement_input(&state.player);
-            m.move_player(&state.player);
+            try m.move_player(&state.player);
 
             if (rl.isKeyPressed(.g)) {
                 try state.player.snake.grow();
@@ -60,8 +62,6 @@ pub fn main() anyerror!void {
 
         if (state.is_finished == false) {
             r.draw_grid(&state.grid);
-            // r.draw_player(&state.player);
-            // r.draw_apples(&state);
         }
     }
 }

@@ -27,14 +27,14 @@ pub fn process_movement_input(p: *Player) void {
     }
 }
 
-pub fn move_player(player: *Player) void {
+pub fn move_player(player: *Player) !void {
     if (player.move_timer < s.player_move_delay) {
         player.move_timer += rl.getFrameTime();
         return;
     }
 
     player.snake.update_directions();
-    player.snake.update_movement();
+    try player.snake.update_movement();
 
     player.move_timer = 0;
 }
