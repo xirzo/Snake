@@ -24,14 +24,11 @@ pub fn main() anyerror!void {
         .grid = Grid{
             .cells = .{.{Cell{ .is_empty = true }} ** s.grid_cell_count} ** s.grid_cell_count,
         },
-
         .player = Player{
             .snake = try Snake.init(.{ .x = 1, .y = 1 }, SnakeDir.right, allocator),
             .move_timer = 0,
-            .color = .green,
         },
         .apples = std.ArrayList(Vector2I).init(allocator),
-        .apple_color = .red,
         .is_finished = false,
     };
 
@@ -62,9 +59,9 @@ pub fn main() anyerror!void {
         rl.clearBackground(.black);
 
         if (state.is_finished == false) {
-            r.draw_grid();
-            r.draw_player(&state.player);
-            r.draw_apples(&state);
+            r.draw_grid(&state.grid);
+            // r.draw_player(&state.player);
+            // r.draw_apples(&state);
         }
     }
 }

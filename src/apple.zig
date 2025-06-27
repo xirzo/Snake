@@ -41,5 +41,5 @@ pub fn spawn_apple(grid: *gr.Grid) !void {
         attempts += 1;
     }
 
-    try grid.occupy_cell(pos);
+    try grid.occupy_cell(gr.CellType.apple, pos);
 }

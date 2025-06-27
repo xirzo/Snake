@@ -15,7 +15,6 @@ pub const player_move_delay: comptime_float = 0.5;
 pub const Player = struct {
     snake: Snake,
     move_timer: f64,
-    color: rl.Color = .red,
 };
 
 pub const State = struct {
@@ -23,7 +22,6 @@ pub const State = struct {
     player: Player,
     is_finished: bool,
     apples: std.ArrayList(Vector2I),
-    apple_color: rl.Color,
 };
 
 pub fn finish_game(state: *State) void {
