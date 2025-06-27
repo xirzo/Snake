@@ -51,9 +51,9 @@ pub fn main() anyerror!void {
                 try state.player.snake.grow();
             }
 
-            // if (rl.isKeyPressed(.r)) {
-            //     try ap.spawn_apple(&state);
-            // }
+            if (rl.isKeyPressed(.r)) {
+                try ap.spawn_apple(&state.grid);
+            }
         }
 
         rl.beginDrawing();

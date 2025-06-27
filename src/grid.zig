@@ -13,15 +13,15 @@ pub const Cell = struct {
 pub const Grid = struct {
     cells: [grid_cell_count][grid_cell_count]Cell,
 
-    pub fn is_cell_empty(self: *Grid, pos: Vector2I) void {
-        return self.cells[pos.x][pos.y].is_empty;
+    pub fn is_cell_empty(self: *Grid, pos: Vector2I) bool {
+        return self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].is_empty;
     }
 
     pub fn occupy_cell(self: *Grid, pos: Vector2I) GridError!void {
-        if (is_cell_empty(self, pos)) {
+        if (is_cell_empty(self, pos) == false) {
             return error.CellAlreadyOccupied;
         }
 
-        self.cells[pos.x][pos.y].is_empty = false;
+        self.cells[@as(usize, @intCast(pos.x))][@as(usize, @intCast(pos.y))].is_empty = false;
     }
 };
