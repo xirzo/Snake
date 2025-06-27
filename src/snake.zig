@@ -1,5 +1,4 @@
 const std = @import("std");
-
 const Vector2I = @import("vector2i.zig").Vector2I;
 
 pub const SnakeDir = enum {
