@@ -1,0 +1,17 @@
+.{
+    .name = .zig_snake,
+    .version = "0.0.0",
+    .fingerprint = 0x68a6b2bf621a9c60, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.14.1",
+    .dependencies = .{
+        .raylib_zig = .{
+            .url = "externals/raylib-zig",
+            .hash = "raylib_zig-5.6.0-dev-KE8REGNJBQDSjjyCmf4ATVQtk_OaBpY0B7kBxwSOPEGZ",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
