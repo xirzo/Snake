@@ -24,12 +24,12 @@ pub const SnakeBlock = struct {
 };
 
 pub const Snake = struct {
-    blocks: std.ArrayList(SnakeBlock),
+    blocks: std.array_list.Managed(SnakeBlock),
     g: *gr.Grid,
 
     pub fn init(start_pos: Vector2I, start_dir: SnakeDir, allocator: std.mem.Allocator, grid: *gr.Grid) !Snake {
         var snake = Snake{
-            .blocks = std.ArrayList(SnakeBlock).init(allocator),
+            .blocks = std.array_list.Managed(SnakeBlock).init(allocator),
             .g = grid,
         };
 

@@ -21,7 +21,7 @@ pub const State = struct {
     grid: Grid,
     player: Player,
     is_finished: bool,
-    apples: std.ArrayList(Vector2I),
+    apples: std.array_list.Managed(Vector2I),
 };
 
 pub fn finish_game(state: *State) void {

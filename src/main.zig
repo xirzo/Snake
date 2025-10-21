@@ -28,7 +28,7 @@ pub fn main() anyerror!void {
             .snake = undefined,
             .move_timer = 0,
         },
-        .apples = std.ArrayList(Vector2I).init(allocator),
+        .apples = std.array_list.Managed(Vector2I).init(allocator),
         .is_finished = false,
     };
 
